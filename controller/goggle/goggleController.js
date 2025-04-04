@@ -2,6 +2,7 @@ import { validationResult } from "express-validator";
 import goggleModel from "../../model/goggle/GoggleModel.js";
 import { customConsole } from "../../util/Util.js";
 import shoeModel from "../../model/shoe/ShoeModel.js";
+import mongoose from "mongoose";
 
 
 
@@ -241,3 +242,96 @@ export const shoeCreateController = async (req, res) => {
         })
     }
 }
+
+
+
+// ------------shoe delete controller----------------
+
+export const shoeDeleteController = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "Shoe ID is required",
+            });
+        }
+
+        const trimmedId = id.trim();
+
+        if (!mongoose.isValidObjectId(trimmedId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Shoe ID",
+            });
+        }
+
+        const deletedShoe = await shoeModel.findByIdAndDelete(trimmedId);
+
+        if (!deletedShoe) {
+            return res.status(404).json({
+                success: false,
+                message: "Shoe not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Shoe deleted successfully",
+            deletedShoe
+        });
+
+    } catch (error) {
+        console.log("🚀 ~ goggleController.js:285 ~ shoeDeleteController ~ error:", error)
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+            error: error.message
+        });
+    }
+};
+
+
+export const goggleDeleteController = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "goggle ID is required",
+            });
+        }
+
+        const trimmedId = id.trim();
+
+        if (!mongoose.isValidObjectId(trimmedId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid goggle ID",
+            });
+        }
+
+        const deletedgoggle = await goggleModel.findByIdAndDelete(trimmedId);
+
+        if (!deletedgoggle) {
+            return res.status(404).json({
+                success: false,
+                message: "goggle not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "goggle deleted successfully",
+            deletedgoggle
+        });
+
+    } catch (error) {
+        console.log("🚀 ~ goggleController.js:330 ~ goggleDeleteController ~ error:", error)
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+            error: error.message
+        });
+    }
+};

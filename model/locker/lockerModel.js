@@ -82,6 +82,11 @@ const lockerSchema = new mongoose.Schema(
             },
         },
         address: { type: String, trim: true, default: "" },
+        isLeft: {
+            type: Boolean,
+            default: false,
+            trim: true
+        }
     },
     { timestamps: true }
 );
@@ -92,18 +97,3 @@ const lockerModel = mongoose.model("LockerData", lockerSchema)
 export default lockerModel
 
 
-// sr_no
-// location
-// locker_no
-// unit
-// code
-// name
-// role
-// status
-// mobile
-// department
-// combine
-// shoe_size
-// image
-// aadhar
-// address

@@ -3,6 +3,7 @@ import AdminLockerModel from "../../../model/locker/Admin/AdminModel.js"
 import { getDataUri } from "../../../middleware/multer/multer.js";
 import cloudinary from 'cloudinary'
 import mongoose from "mongoose";
+import { parseBoolean } from "../../../util/Util.js";
 
 // ----------get all admin locker -------------
 export const getAllAdminLockerController = async (req, res) => {
@@ -200,66 +201,132 @@ export const deleteByIdAdminLockerController = async (req, res) => {
 
 // -----------update admin locker controller------------
 
+// export const updateByIdAdminLockerController = async (req, res) => {
+//     try {
+
+//         const errors = validationResult(req);
+//         if (!errors.isEmpty()) {
+//             // If there are validation errors, return them
+//             return res.status(400).json({ errors: errors.array() });
+//         }
+
+//         const { code, before, locker_no, name, department, status, mobile, shoe_size, isLeft } = req.body
+
+//         const { id } = req.params
+
+//         if (!req.file) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: "Image is required",
+//             });
+//         }
+
+//         if (!mongoose.isValidObjectId(id)) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: "Invalid  Locker ID",
+//             });
+//         }
+
+//         const beforeUpdate = await AdminLockerModel.findById(id)
+
+//         if (!beforeUpdate) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: "Admin before locker not found",
+//             })
+//         }
+
+//         const file = getDataUri(req.file)
+
+//         if (beforeUpdate.image.public_id) {
+//             try {
+//                 await cloudinary.v2.uploader.destroy(beforeUpdate.image.public_id)
+
+//             } catch (error) {
+//                 console.log("🚀 ~ getAllAdminLockerController.js:246 ~ updateByIdAdminLockerController ~ error:", error)
+//                 return res.status(500).json({
+//                     success: false,
+//                     message: "Error while deleting image from cloudinary",
+//                     error: error.message,
+//                 })
+//             }
+//         }
+
+//         const uploadImage = await cloudinary.v2.uploader.upload(file.content, {
+//             folder: "admin Locker",
+//             transformation: [
+//                 { width: 500, height: 500, crop: "limit" },
+//                 { fetch_format: "auto", quality: "auto" }
+//             ]
+//         })
+
+//         const updateData = {
+//             code,
+//             before,
+//             locker_no,
+//             name,
+//             department,
+//             status,
+//             mobile,
+//             shoe_size,
+//             isLeft: parseBoolean(isLeft),
+//             image: {
+//                 public_id: uploadImage.public_id,
+//                 url: uploadImage.secure_url
+//             }
+//         }
+
+//         const updateLocker = await AdminLockerModel.findByIdAndUpdate(id, updateData, {
+//             new: true,
+//             runValidators: true,
+//         });
+
+//         return res.status(200).json({
+//             beforeUpdate: beforeUpdate,
+//             success: true,
+//             message: "Admin locker updated successfully",
+//             updateLocker: updateLocker
+//         })
+
+//     } catch (error) {
+//         console.log("🚀 ~ getAllAdminLockerController.js:213 ~ updateByIdAdminLockerController ~ error:", error)
+//         return res.status(500).json({
+//             success: false,
+//             message: "Something went wrong while updating admin locker",
+//             error: error.message,
+//         })
+//     }
+// }
+
+
 export const updateByIdAdminLockerController = async (req, res) => {
     try {
-
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            // If there are validation errors, return them
             return res.status(400).json({ errors: errors.array() });
         }
 
-        const { code, before, locker_no, name, department, status, mobile, shoe_size, } = req.body
-
-        const { id } = req.params
-
-        if (!req.file) {
-            return res.status(400).json({
-                success: false,
-                message: "Image is required",
-            });
-        }
+        const { code, before, locker_no, name, department, status, mobile, shoe_size, isLeft } = req.body;
+        const { id } = req.params;
 
         if (!mongoose.isValidObjectId(id)) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid  Locker ID",
+                message: "Invalid Locker ID",
             });
         }
 
-        const beforeUpdate = await AdminLockerModel.findById(id)
+        const beforeUpdate = await AdminLockerModel.findById(id);
 
         if (!beforeUpdate) {
             return res.status(400).json({
                 success: false,
-                message: "Admin before locker not found",
-            })
+                message: "Admin locker not found",
+            });
         }
 
-        const file = getDataUri(req.file)
-
-        if (beforeUpdate.image.public_id) {
-            try {
-                await cloudinary.v2.uploader.destroy(beforeUpdate.image.public_id)
-
-            } catch (error) {
-                console.log("🚀 ~ getAllAdminLockerController.js:246 ~ updateByIdAdminLockerController ~ error:", error)
-                return res.status(500).json({
-                    success: false,
-                    message: "Error while deleting image from cloudinary",
-                    error: error.message,
-                })
-            }
-        }
-
-        const uploadImage = await cloudinary.v2.uploader.upload(file.content, {
-            folder: "admin Locker",
-            transformation: [
-                { width: 500, height: 500, crop: "limit" },
-                { fetch_format: "auto", quality: "auto" }
-            ]
-        })
-
+        // Prepare the update data
         const updateData = {
             code,
             before,
@@ -269,10 +336,40 @@ export const updateByIdAdminLockerController = async (req, res) => {
             status,
             mobile,
             shoe_size,
-            image: {
+            isLeft: parseBoolean(isLeft),
+        };
+
+        // If new image is uploaded
+        if (req.file) {
+            const file = getDataUri(req.file);
+
+            // Delete old image if exists
+            if (beforeUpdate.image?.public_id) {
+                try {
+                    await cloudinary.v2.uploader.destroy(beforeUpdate.image.public_id);
+                } catch (error) {
+                    console.log("Error deleting image from Cloudinary:", error);
+                    return res.status(500).json({
+                        success: false,
+                        message: "Error while deleting image from Cloudinary",
+                        error: error.message,
+                    });
+                }
+            }
+
+            // Upload new image
+            const uploadImage = await cloudinary.v2.uploader.upload(file.content, {
+                folder: "admin Locker",
+                transformation: [
+                    { width: 500, height: 500, crop: "limit" },
+                    { fetch_format: "auto", quality: "auto" }
+                ]
+            });
+
+            updateData.image = {
                 public_id: uploadImage.public_id,
                 url: uploadImage.secure_url
-            }
+            };
         }
 
         const updateLocker = await AdminLockerModel.findByIdAndUpdate(id, updateData, {
@@ -281,21 +378,23 @@ export const updateByIdAdminLockerController = async (req, res) => {
         });
 
         return res.status(200).json({
-            beforeUpdate: beforeUpdate,
+            beforeUpdate,
             success: true,
             message: "Admin locker updated successfully",
-            updateLocker: updateLocker
-        })
+            updateLocker
+        });
 
     } catch (error) {
-        console.log("🚀 ~ getAllAdminLockerController.js:213 ~ updateByIdAdminLockerController ~ error:", error)
+        console.log("Update Admin Locker Error:", error);
         return res.status(500).json({
             success: false,
             message: "Something went wrong while updating admin locker",
             error: error.message,
-        })
+        });
     }
-}
+};
+
+
 
 export const searchAllAdminLockerController = async (req, res) => {
     try {

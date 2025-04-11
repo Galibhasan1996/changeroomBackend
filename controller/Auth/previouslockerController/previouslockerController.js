@@ -249,12 +249,19 @@ export const previousLockerGetByIdController = async (req, res) => {
 
 export const previousAdminLockerUpdateController = async (req, res) => {
     try {
-        const { sr_no, locker_no, code, name, status, mobile, department, shoe_size, public_id, url, before } = req.body;
 
         if (!req.body || Object.keys(req.body).length === 0) {
             return res.status(400).json({
                 success: false,
                 message: "Request body cannot be empty",
+            });
+        }
+        const { sr_no, locker_no, code, name, status, mobile, department, shoe_size, public_id, url, before } = req.body;
+
+        if (!locker_no) {
+            return res.status(400).json({
+                success: false,
+                message: "locker_no is required",
             });
         }
 
@@ -297,7 +304,7 @@ export const previousAdminLockerUpdateController = async (req, res) => {
                 status,
                 mobile,
                 shoe_size,
-                sr_no,
+                // sr_no,
             }, { new: true });
 
             return res.status(200).json({
@@ -307,14 +314,16 @@ export const previousAdminLockerUpdateController = async (req, res) => {
             });
         }
     } catch (error) {
-        console.log("🚀 ~ previouslockerController.js:308 ~ previousAdminLockerUpdateController ~ error:", error)
+        console.log("🚀 ~ previouslockerController.js:317 ~ previousAdminLockerUpdateController ~ error:", error)
 
-        if (error.name === "CastError") {
+        if (error.code === 11000 && error.keyValue) {
+            const duplicateField = Object.keys(error.keyValue)[0];
             return res.status(400).json({
                 success: false,
-                message: "Invalid locker ID",
+                message: `Duplicate value for '${duplicateField}'. A record with this ${duplicateField} already exists.`,
             });
         }
+
 
         return res.status(500).json({
             success: false,
@@ -406,7 +415,7 @@ export const preAdminLockerGetByIdController = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: "Locker fetched successfully",
-            data: locker
+            locker
         });
 
     } catch (error) {

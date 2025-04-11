@@ -9,7 +9,7 @@ import cloudinary from 'cloudinary'
 import mongoose from "mongoose"
 import { sendOTPMailer } from "../../nodemailer/nodemailer.js"
 import bcrypt from "bcrypt";
-import { customConsole, ganerateToken } from "../../util/Util.js"
+import { customConsole, ganerateToken, parseBoolean } from "../../util/Util.js"
 
 
 // ----------------registerController----------------------
@@ -327,8 +327,8 @@ export const createLockerController = async (req, res) => {
 export const updateLockerController = async (req, res) => {
     try {
 
-        const { combine, sr_no, location, locker_no, unit, code, name, role, status, mobile, department, shoe_size, aadhar, address } = req.body
-
+        const { combine, sr_no, location, locker_no, unit, code, name, role, status, mobile, department, shoe_size, aadhar, address, isLeft } = req.body
+        // console.log(req.body);
         const { _id } = req.params
         // Validate the request
         const errors = validationResult(req);
@@ -363,7 +363,8 @@ export const updateLockerController = async (req, res) => {
             department,
             shoe_size,
             aadhar,
-            address
+            address,
+            isLeft: parseBoolean(isLeft)
         }
 
 

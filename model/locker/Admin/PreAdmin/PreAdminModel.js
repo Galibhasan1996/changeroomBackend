@@ -7,7 +7,7 @@ const preAdminLockerSchema = new mongoose.Schema(
         sr_no: {
             type: Number,
             trim: true,
-            unique: true,
+            // unique: true,
         },
         code: {
             type: String,
@@ -70,17 +70,21 @@ const preAdminLockerSchema = new mongoose.Schema(
                 default: ""
             },
         },
+        isLeft: {
+            type: Boolean,
+            default: false
+        }
     },
     { timestamps: true }
 );
 
-preAdminLockerSchema.pre("save", async function (next) {
-    if (!this.sr_no) {
-        const lastLocker = await mongoose.model("preAdminlockerdata").findOne().sort({ sr_no: -1 });
-        this.sr_no = lastLocker ? lastLocker.sr_no + 1 : 1;
-    }
-    next();
-});
+// preAdminLockerSchema.pre("save", async function (next) {
+//     if (!this.sr_no) {
+//         const lastLocker = await mongoose.model("preAdminlockerdata").findOne().sort({ sr_no: -1 });
+//         this.sr_no = lastLocker ? lastLocker.sr_no + 1 : 1;
+//     }
+//     next();
+// });
 
 
 

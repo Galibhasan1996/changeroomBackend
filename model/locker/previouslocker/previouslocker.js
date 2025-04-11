@@ -82,6 +82,10 @@ const previouslockerSchema = new mongoose.Schema(
             },
         },
         address: { type: String, trim: true, default: "" },
+        isLeft: {
+            type: Boolean,
+            default: false
+        }
     },
     { timestamps: true }
 );

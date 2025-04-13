@@ -13,10 +13,10 @@ import { currentIPAddress, currentTime } from "./util/Util.js"
 import { config } from "./util/EnvVariabe.js"
 import chalk from "chalk"
 import { connectDB } from "./db.js"
-import AuthRoute from "../changeroomBackend/route/AuthRoute/AuthRoute.js"
-import previous from "../changeroomBackend/route/AuthRoute/previouslockerRoute/previouslockerRoute.js"
-import Admin from "../changeroomBackend/route/Admin/AdminRoute.js"
-import goggle from "../changeroomBackend/route/goggle/goggleRoute.js"
+import AuthRoute from "./route/AuthRoute/AuthRoute.js"
+import previous from "./route/AuthRoute/previouslockerRoute/previouslockerRoute.js"
+import Admin from "./route/Admin/AdminRoute.js"
+import goggle from "./route/goggle/goggleRoute.js"
 import cloudinary from 'cloudinary';
 
 

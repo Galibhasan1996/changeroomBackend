@@ -17,7 +17,7 @@ export const Auth = async (req, res, next) => {
         }
 
         const userOBJ = JWT.verify(token, config.get("JWT_SECRET"));
-        // customConsole("🚀 ~ AuthMiddleware.js:19 ~ Auth ~ userOBJ:", userOBJ)
+        customConsole("🚀 ~ AuthMiddleware.js:19 ~ Auth ~ userOBJ:", userOBJ._id)
 
 
 
@@ -29,7 +29,8 @@ export const Auth = async (req, res, next) => {
         }
 
 
-        const user = await UserModel.findById(userOBJ?._id?._id);
+        // const user = await UserModel.findById(userOBJ?._id?._id);
+        const user = await UserModel.findById(userOBJ?._id);
 
         if (!user) {
             return res.status(401).json({

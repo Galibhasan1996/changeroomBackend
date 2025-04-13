@@ -18,14 +18,12 @@ export const registerController = async (req, res) => {
 
         const { name, email, mobile, password, dateOfBirth } = req.body
 
-
         // Validate the request
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             // If there are validation errors, return them
             return res.status(400).json({ errors: errors.array() });
         }
-
 
         const isExist = await UserModel.findOne({ email })
         if (isExist) {
@@ -38,7 +36,6 @@ export const registerController = async (req, res) => {
         // const registerationAttemptsByUser = await UserModel.find({ email, Verified: false });
         const unverifiedAttemptsCount = await UserModel.countDocuments({ email, Verified: false });
 
-
         if (unverifiedAttemptsCount.length > 3) {
 
             return res.status(400).json({
@@ -47,7 +44,6 @@ export const registerController = async (req, res) => {
                 error: "You have exceeded the maximum number of attempts (3). Please try again after an hour.",
             })
         }
-
 
         const user = await UserModel.create({
             name,
@@ -58,7 +54,8 @@ export const registerController = async (req, res) => {
         })
 
         // const { refreshToken, token } = ganerateToken(user)
-        const token = JWT.sign({ _id: user }, config.get("JWT_SECRET"), { expiresIn: "10d" })
+        const token = JWT.sign({ _id: user }, config.get("JWT_SECRET"), { expiresIn: "7d" })
+        const refreshToken = JWT.sign({ _id: user }, config.get("JWT_SECRET"), { expiresIn: "15d" })
 
         const OTP = () => Math.floor(100000 + Math.random() * 900000).toString();
         const otpCode = OTP();
@@ -71,12 +68,13 @@ export const registerController = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            user,
-            token,
             message: "user register successfully",
+            token,
+            refreshToken,
+            user,
         })
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:65 ~ registerController ~ error:", error)
+        console.log("🚀 ~ AuthController.js:77 ~ registerController ~ error:", error)
         return res.status(400).json({
             success: false,
             message: "Something went wrong",
@@ -85,9 +83,7 @@ export const registerController = async (req, res) => {
     }
 }
 
-
 // -------------------LoginController----------------------
-
 
 export const loginController = async (req, res) => {
     try {
@@ -128,15 +124,12 @@ export const loginController = async (req, res) => {
             })
         }
 
-
-
-
-        // const { refreshToken, token } = ganerateToken(user)
-        const token = JWT.sign({ _id: user }, config.get("JWT_SECRET"), { expiresIn: "10d" })
+        const token = JWT.sign({ _id: user }, config.get("JWT_SECRET"), { expiresIn: "7d" })
+        const refresh_token = JWT.sign({ _id: user }, config.get("JWT_SECRET"), { expiresIn: "15d" })
 
         await user.save()
         return res.status(200).cookie('token', token, {
-            expires: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
+            expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             httpOnly: config.get("NODE_ENV") === "development" ? true : false,
             sameSite: config.get("NODE_ENV") === "development" ? true : false,
             secure: config.get("NODE_ENV") === "development" ? true : false,
@@ -144,13 +137,13 @@ export const loginController = async (req, res) => {
             .json({
                 status: true,
                 message: "Login successfully",
-                user,
                 token,
+                refresh_token,
+                user,
             })
 
-
     } catch (error) {
-        console.log("🚀 ~ loginController ~ error:", error)
+        console.log("🚀 ~ AuthController.js:146 ~ loginController ~ error:", error)
     }
 }
 
@@ -190,7 +183,7 @@ export const getLockerController = async (req, res) => {
         });
 
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:176 ~ getLockerController ~ error:", error)
+        console.log("🚀 ~ AuthController.js:186 ~ getLockerController ~ error:", error)
         return res.status(500).json({
             success: false,
             message: "Internal Server Error",
@@ -314,7 +307,7 @@ export const createLockerController = async (req, res) => {
             message: "locker create successfully",
         })
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:300 ~ createLockerController ~ error:", error)
+        console.log("🚀 ~ AuthController.js:310 ~ createLockerController ~ error:", error)
         return res.status(400).json({
             success: false,
             message: "Something went wrong",
@@ -347,8 +340,6 @@ export const updateLockerController = async (req, res) => {
             });
         }
 
-
-
         const updateData = {
             combine,
             sr_no,
@@ -367,7 +358,6 @@ export const updateLockerController = async (req, res) => {
             isLeft: parseBoolean(isLeft)
         }
 
-
         const updateLocker = await lockerModel.findByIdAndUpdate(_id, updateData, {
             new: true,
             runValidators: true,
@@ -381,8 +371,6 @@ export const updateLockerController = async (req, res) => {
             });
         }
 
-
-
         return res.status(200).json({
             previousLocker,
             success: true,
@@ -391,14 +379,12 @@ export const updateLockerController = async (req, res) => {
         });
 
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:397 ~ updateLockerController ~ error:", error)
+        console.log("🚀 ~ AuthController.js:382 ~ updateLockerController ~ error:", error)
         return res.status(500).json({
             success: false,
             message: "Something went wrong",
             error: error.message,
         });
-
-
     }
 };
 
@@ -428,7 +414,7 @@ export const getLockerByIdController = async (req, res) => {
             locker,
         });
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:434 ~ getLockerByIdController ~ error:", error)
+        console.log("🚀 ~ AuthController.js:417 ~ getLockerByIdController ~ error:", error)
         return res.status(500).json({
             success: false,
             message: "Internal server error",
@@ -444,8 +430,6 @@ export const getLockerByIdController = async (req, res) => {
 export const updateUserPhotoController = async (req, res) => {
     try {
         const { id } = req.params;
-
-
         // Check if ID is missing
         if (!id) {
             return res.status(400).json({
@@ -453,7 +437,6 @@ export const updateUserPhotoController = async (req, res) => {
                 message: "Locker ID is required",
             });
         }
-
 
         // Validate MongoDB ObjectId
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -517,14 +500,7 @@ export const updateUserPhotoController = async (req, res) => {
         });
 
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:523 ~ updateUserPhotoController ~ error:", error)
-
-        if (error.name === 'CastError') {
-            return res.status(500).send({
-                status: false,
-                error: `invalid id`
-            });
-        }
+        console.log("🚀 ~ AuthController.js:503 ~ updateUserPhotoController ~ error:", error)
         return res.status(500).json({
             success: false,
             message: "Something went wrong",
@@ -539,8 +515,6 @@ export const updateUserPhotoController = async (req, res) => {
 export const searchByCodeLockerController = async (req, res) => {
     try {
         const { search, } = req.query;
-
-
         // Validate if search parameter is provided
         if (!search || search.trim() === "") {
             return res.status(400).json({
@@ -564,7 +538,6 @@ export const searchByCodeLockerController = async (req, res) => {
                     { department: { $regex: search, $options: "i" } },
                     // Only search in numeric fields if the input is a valid number
                     ...(isNumber ? [{ aadhar: Number(search) }, { mobile: Number(search) }] : []),
-
                 ],
             };
         }
@@ -580,7 +553,7 @@ export const searchByCodeLockerController = async (req, res) => {
             locker,
         });
     } catch (err) {
-        console.log("🚀 ~ AuthController.js:585 ~ searchByCodeLockerController ~ err:", err)
+        console.log("🚀 ~ AuthController.js:556 ~ searchByCodeLockerController ~ err:", err)
         res.status(500).json({
             error: true,
             message: "Internal Server Error",
@@ -639,7 +612,7 @@ export const verifyOtpController = async (req, res) => {
         });
 
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:628 ~ verifyOtpController ~ error:", error.message)
+        console.log("🚀 ~ AuthController.js:615 ~ verifyOtpController ~ error:", error.message)
         return res.status(500).json({
             success: false,
             error: "Something went wrong",
@@ -669,7 +642,7 @@ export const getAllUserController = async (req, res) => {
         });
 
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:674 ~ getAllUserController ~ error:", error)
+        console.log("🚀 ~ AuthController.js:645 ~ getAllUserController ~ error:", error)
         return res.status(500).json({
             success: false,
             message: "Internal Server Error",
@@ -687,14 +660,28 @@ export const refreshTokenController = async (req, res) => {
         if (!refresh_token) {
             return res.status(401).json({
                 success: false,
-                message: "Refresh token is required",
+                message: `refresh_token is required`,
             });
         }
 
+        let payload;
+        try {
+            payload = JWT.verify(refresh_token, config.get("JWT_SECRET"));
+        } catch (err) {
+            if (err.name === "TokenExpiredError") {
+                return res.status(401).json({
+                    success: false,
+                    message: "Refresh token has expired. Please log in again.",
+                    error: err
+                });
+            }
+            return res.status(403).json({
+                success: false,
+                message: "Invalid refresh token.",
+            });
+        }
 
-        const payload = JWT.verify(refresh_token, config.get("JWT_SECRET"))
-
-        const user = await UserModel.findById(payload.id._id);
+        const user = await UserModel.findById(payload._id);
 
         if (!user) {
             return res.status(404).json({
@@ -703,23 +690,23 @@ export const refreshTokenController = async (req, res) => {
             });
         }
 
-        const { token, refreshToken } = ganerateToken(user)
+        const token = JWT.sign({ _id: user._id }, config.get("JWT_SECRET"), { expiresIn: "7d" });
+        const refreshToken = JWT.sign({ _id: user._id }, config.get("JWT_SECRET"), { expiresIn: "15d" });
 
         return res.status(200).json({
             success: true,
             message: "Token refreshed successfully",
+            token,
+            refreshToken,
             user,
-            newToken: token,
-            newRefreshToken: refreshToken,
         });
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:687 ~ refreshTokenController=async ~ error:", error)
+        console.log("🚀 ~ refreshTokenController error:", error);
         return res.status(500).json({
             success: false,
             message: "Internal Server Error",
-            error: error.message,
         });
     }
-}
+};
 
 

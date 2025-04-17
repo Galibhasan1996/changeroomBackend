@@ -208,14 +208,30 @@ export const shoeController = async (req, res) => {
 
 export const shoeCreateController = async (req, res) => {
     try {
-
-        const { name, emp_code, employer, department, issue_quantity, mobile, shoe_size } = req.body
+        let { name, emp_code, employer, department, issue_quantity, mobile, shoe_size, date } = req.body;
 
         // Validate the request
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            // If there are validation errors, return them
             return res.status(400).json({ errors: errors.array() });
+        }
+
+        const dateRegex = /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\d{4}$/;
+
+        if (date) {
+            if (!dateRegex.test(date)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid date format. Expected format is dd-mm-yyyy."
+                });
+            }
+
+            const [day, month, year] = date.split('-');
+            // date = new Date(`${year}-${month}-${day}T00:00:00Z`);
+            const now = new Date();
+            date = new Date(`${year}-${month}-${day}T${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}Z`);
+        } else {
+            date = new Date();
         }
 
         const shoe = await shoeModel.create({
@@ -225,23 +241,35 @@ export const shoeCreateController = async (req, res) => {
             department,
             issue_quantity,
             mobile,
-            shoe_size
-        })
+            shoe_size,
+            date,
+        });
+
+        // const formatDate = (date) => {
+        //     const d = new Date(date);
+        //     const year = d.getFullYear();
+        //     const month = String(d.getMonth() + 1).padStart(2, '0');
+        //     const day = String(d.getDate()).padStart(2, '0');
+        //     return `${day}-${month}-${year}`;
+        // };
+
         return res.status(200).json({
             success: true,
             message: "shoe created successfully",
+            // date: formatDate(shoe.date),
             shoe,
         });
 
     } catch (error) {
-        console.log("🚀 ~ goggleController.js:236 ~ shoeCreateController ~ error:", error)
+        console.log("🚀 ~ shoeCreateController ~ error:", error);
         return res.status(500).json({
             success: false,
             message: "Internal Server Error",
             error: error.message
-        })
+        });
     }
-}
+};
+
 
 
 

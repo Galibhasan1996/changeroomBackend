@@ -7,7 +7,7 @@ dotenv.config();
 
 export const Auth = async (req, res, next) => {
     try {
-        const token = req.headers.authorization?.split(" ")[1]; // Only check Authorization header
+        const token = req.headers.authorization?.split(" ")[1];
 
         if (!token) {
             return res.status(401).json({
@@ -17,7 +17,7 @@ export const Auth = async (req, res, next) => {
         }
 
         const userOBJ = JWT.verify(token, config.get("JWT_SECRET"));
-        customConsole("🚀 ~ AuthMiddleware.js:19 ~ Auth ~ userOBJ:", userOBJ._id)
+        // customConsole("🚀 ~ AuthMiddleware.js:19 ~ Auth ~ userOBJ:", userOBJ._id)
 
 
 
@@ -60,7 +60,7 @@ export const Auth = async (req, res, next) => {
 
 export const isAdmin = async (req, res, next) => {
     try {
-        const token = req.headers.authorization?.split(" ")[1]; // Only check Authorization header
+        const token = req.headers.authorization?.split(" ")[1];
 
         if (!token) {
             return res.status(401).json({

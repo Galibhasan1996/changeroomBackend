@@ -388,6 +388,102 @@ export const updateLockerController = async (req, res) => {
     }
 };
 
+// export const updateLockerController = async (req, res) => {
+//     try {
+
+//         const { combine, sr_no, location, locker_no, unit, code, name, role, status, mobile, department, shoe_size, aadhar, address, isLeft } = req.body;
+//         const { id } = req.params;
+
+//         if (!mongoose.isValidObjectId(id)) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: "Invalid Locker ID",
+//             });
+//         }
+
+//         const beforeUpdate = await lockerModel.findById(id);
+
+//         if (!beforeUpdate) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: "locker not found",
+//             });
+//         }
+
+//         // Prepare the update data
+//         const updateData = {
+//             combine,
+//             sr_no,
+//             location,
+//             unit,
+//             role,
+//             aadhar,
+//             address,
+//             code,
+//             locker_no,
+//             name,
+//             department,
+//             status,
+//             mobile,
+//             shoe_size,
+//             isLeft: parseBoolean(isLeft),
+//         };
+
+//         // If new image is uploaded
+//         if (req.file) {
+//             const file = getDataUri(req.file);
+
+//             // Delete old image if exists
+//             if (beforeUpdate.image?.public_id) {
+//                 try {
+//                     await cloudinary.v2.uploader.destroy(beforeUpdate.image.public_id);
+//                 } catch (error) {
+//                     console.log("Error deleting image from Cloudinary:", error);
+//                     return res.status(500).json({
+//                         success: false,
+//                         message: "Error while deleting image from Cloudinary",
+//                         error: error.message,
+//                     });
+//                 }
+//             }
+
+//             // Upload new image
+//             const uploadImage = await cloudinary.v2.uploader.upload(file.content, {
+//                 folder: "lockers",
+//                 transformation: [
+//                     { width: 500, height: 500, crop: "limit" },
+//                     { fetch_format: "auto", quality: "auto" }
+//                 ]
+//             });
+
+//             updateData.image = {
+//                 public_id: uploadImage.public_id,
+//                 url: uploadImage.secure_url
+//             };
+//         }
+
+//         const updateLocker = await lockerModel.findByIdAndUpdate(id, updateData, {
+//             new: true,
+//             runValidators: true,
+//         });
+
+//         return res.status(200).json({
+//             beforeUpdate,
+//             success: true,
+//             message: "locker updated successfully",
+//             updateLocker
+//         });
+
+//     } catch (error) {
+//         console.log("🚀 ~ AuthController.js:476 ~ updateByIdAdminLockerController ~ error:", error)
+//         return res.status(500).json({
+//             success: false,
+//             message: "Something went wrong while updating locker",
+//             error: error.message,
+//         });
+//     }
+// };
+
 // get locker by id controller 
 export const getLockerByIdController = async (req, res) => {
     try {
@@ -710,3 +806,98 @@ export const refreshTokenController = async (req, res) => {
 };
 
 
+export const getAllUsersController = async (req, res) => {
+    try {
+        let { limit = 10, cursor = undefined, direction = "next", search = "" } = req.query;
+
+        // Validate inputs
+        limit = parseInt(limit);
+        if (isNaN(limit) || limit <= 0) limit = 10;
+        limit = Math.min(limit, 100); // Cap maximum limit
+
+        if (direction !== "next" && direction !== "prev") direction = "next";
+
+        if (cursor && !mongoose.Types.ObjectId.isValid(cursor)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid cursor format"
+            });
+        }
+
+        // Build filter
+        const filter = {};
+
+        // Add search functionality
+        if (search) {
+            filter.$or = [
+                { name: { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        // Add cursor filtering
+        if (cursor) {
+            if (direction === "next") {
+                filter._id = { $gt: new mongoose.Types.ObjectId(cursor) };
+            } else if (direction === "prev") {
+                filter._id = { $lt: new mongoose.Types.ObjectId(cursor) };
+            }
+        }
+
+        const sortOrder = direction === "next" ? 1 : -1;
+
+        // Execute query with optimization
+        const users = await UserModel.find(filter)
+            .select('name email profilePic role createdAt')
+            .sort({ _id: sortOrder })
+            .limit(limit + 1)
+            .lean();
+
+        // Check if we have more results
+        const hasMore = users.length > limit;
+
+        // Remove the extra item if we fetched one
+        if (hasMore) users.pop();
+
+        // Reverse for "prev" direction
+        if (direction === "prev") {
+            users.reverse();
+        }
+
+        // Set cursors
+        let nextCursor = null;
+        let prevCursor = null;
+
+        if (users.length > 0) {
+            nextCursor = hasMore ? users[users.length - 1]._id : null;
+            prevCursor = users[0]._id;
+        }
+
+        // Set cache headers
+        res.setHeader('Cache-Control', 'private, max-age=300');
+
+        return res.status(200).json({
+            success: true,
+            message: "Users fetched successfully",
+            pagination: {
+                nextCursor,
+                prevCursor,
+                count: users.length,
+                hasMore
+            },
+            users,
+        });
+    } catch (error) {
+        console.error("Error in getAllUsersController:", error);
+
+        if (error.name === 'CastError') {
+            return res.status(400).json({ success: false, message: "Invalid input format" });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+};

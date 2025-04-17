@@ -21,7 +21,7 @@ route.get("/getLocker", Auth, getLockerController)
 route.post('/createlocker', Auth, validateLocker, singleUpload, createLockerController)
 
 // -----------------update locker route-----------------
-route.put('/updatelocker/:_id', Auth, validateLocker, updateLockerController)
+route.put('/updatelocker/:_id', Auth, singleUpload, updateLockerController)
 // ----------------get locker by id route-----------------
 
 route.get('/getlockerbyid/:id', Auth, getLockerByIdController)

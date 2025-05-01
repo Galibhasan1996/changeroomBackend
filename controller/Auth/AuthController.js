@@ -901,3 +901,41 @@ export const getAllUsersController = async (req, res) => {
         });
     }
 };
+
+
+
+
+export const getLockerCombineController = async (req, res) => {
+    try {
+        const { combine } = req.body;
+
+        const split = combine.split(" / ");
+        const swapped = [split[1], split[0]].join(" / ");
+
+        let locker = await lockerModel.findOne({ combine });
+
+        if (!locker) {
+            locker = await lockerModel.findOne({ combine: swapped });
+        }
+
+        if (!locker) {
+            return res.status(404).json({
+                success: false,
+                message: "No lockers found ",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Locker found successfully",
+            locker,
+        });
+
+    } catch (error) {
+        console.log("🚀 ~ AuthController.js:935 ~ getLockerCombineController ~ error:", error)
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+};

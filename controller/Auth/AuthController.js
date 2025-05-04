@@ -270,8 +270,6 @@ export const createLockerController = async (req, res) => {
         // photo get 
         const file = getDataUri(req.file)
 
-        // delete old photo in data
-        // await cloudinary.v2.uploader.destroy(creatLocker.image.public_id)
 
         // update
         const imageFileUpload = await cloudinary.v2.uploader.upload(file.content)
@@ -379,7 +377,7 @@ export const updateLockerController = async (req, res) => {
         });
 
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:382 ~ updateLockerController ~ error:", error)
+        console.log("🚀 ~ AuthController.js:380~ updateLockerController ~ error:", error)
         return res.status(500).json({
             success: false,
             message: "Something went wrong",
@@ -907,7 +905,8 @@ export const getAllUsersController = async (req, res) => {
 
 export const getLockerCombineController = async (req, res) => {
     try {
-        const { combine } = req.body;
+        const { combine } = req.body
+
 
         const split = combine.split(" / ");
         const swapped = [split[1], split[0]].join(" / ");
@@ -939,3 +938,47 @@ export const getLockerCombineController = async (req, res) => {
         });
     }
 };
+
+
+export const getTotalLokerController = async (req, res) => {
+    try {
+
+        const totalLockers = await lockerModel.aggregate([
+            {
+                $group: {
+                    _id: "$role",
+                    total: { $sum: 1 }
+                }
+            }
+        ])
+
+        const sum = totalLockers.reduce((acc, curr) => acc + curr.total, 0);
+
+        // const totalLockers = await lockerModel.updateMany(
+        //     {
+        //         role: {
+        //             $regex: /^\s*(Store|Fm)\s*$/i
+        //         }
+        //     },
+        //     { $set: { role: "FM" } }
+        // );
+
+
+
+        return res.status(200).json({
+            success: true,
+            message: "Total lockers fetched successfully",
+            totalLockers,
+            totalSum: sum
+        });
+
+
+
+    } catch (error) {
+        console.log("🚀 ~ AuthController.js:949 ~ getTotalLokerController ~ error:", error)
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        })
+    }
+}

@@ -1,6 +1,6 @@
 import express from "express";
 import {
-    createLockerController, getAllUserController, getLockerByIdController, getLockerCombineController, getLockerController, loginController, refreshTokenController, registerController,
+    createLockerController, getAllUserController, getLockerByIdController, getLockerCombineController, getLockerController, getTotalLokerController, loginController, refreshTokenController, registerController,
     searchByCodeLockerController, updateLockerController, updateUserPhotoController, verifyOtpController
 } from "../../controller/Auth/AuthController.js";
 import { validateLocker, validateLogin, validateRegister } from "../../util/Validator/Validator.js";
@@ -42,6 +42,9 @@ route.get("/alluser", getAllUserController)
 route.post("/refreshToken", refreshTokenController)
 // ------------get combine locker ------------
 route.get("/combine", getLockerCombineController)
+
+// --------totol locker ------------------
+route.get("/totallocker", getTotalLokerController)
 
 
 

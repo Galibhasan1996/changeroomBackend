@@ -6,7 +6,6 @@ const lockerSchema = new mongoose.Schema(
     {
         sr_no: {
             type: Number,
-            trim: true,
             default: ""
         },
         location: {
@@ -36,8 +35,18 @@ const lockerSchema = new mongoose.Schema(
         },
         role: {
             type: String,
+            required: [true, "Employer is required"],
             trim: true,
-            default: ""
+            set: value => value?.toUpperCase(),
+            validate: {
+                validator: function (value) {
+                    const allowedEmployers = [
+                        "NEEM", "NAPS", "TDS", "SSD", "CHAUDHARY", "LOREAL", "PERFECT SERVICE", "FM", "SIS", "RKS",
+                    ];
+                    return allowedEmployers.includes(value.toUpperCase());
+                },
+                message: "Invalid employer value"
+            }
         },
         status: {
             type: String,
@@ -55,7 +64,25 @@ const lockerSchema = new mongoose.Schema(
                 message: "Mobile number must be exactly 10 digits",
             },
         },
-        department: { type: String, trim: true, default: "" },
+        department: {
+            type: String,
+            required: [true, "Department is required"],
+            trim: true,
+            set: value => value?.toUpperCase(),
+            validate: {
+                validator: function (value) {
+                    const allowedEmployers = [
+                        "FLOW", "STORE", "OPERATOR", "SUPERVISOR",
+                        "HOUSEKEEPING", "MAINTENANCE", "MFG", "QUALITY", "ADMIN", "HR", "PRODUCTION",
+                        "FINANCE", "SAFETY", "ACCOUNT", "PROJECT", "IT", "MSC", "SECURITY", "UTILITY",
+                        "BOILER", "ETP", "PACKING", "LOADING",
+                        "CHANGEROOM", "CONTRECTOR",
+                    ];
+                    return allowedEmployers.includes(value.toUpperCase());
+                },
+                message: "Invalid department value"
+            }
+        },
         combine: { type: String, trim: true, default: "" },
         shoe_size: {
             type: Number,
@@ -68,8 +95,14 @@ const lockerSchema = new mongoose.Schema(
             },
         },
         image: {
-            public_id: { type: String, default: "" },
-            url: { type: String, default: "" },
+            public_id: {
+                type: String,
+                default: ""
+            },
+            url: {
+                type: String,
+                default: ""
+            },
         },
         aadhar: {
             type: Number,
@@ -85,7 +118,6 @@ const lockerSchema = new mongoose.Schema(
         isLeft: {
             type: Boolean,
             default: false,
-            trim: true
         }
     },
     { timestamps: true }

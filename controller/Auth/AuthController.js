@@ -949,18 +949,22 @@ export const getTotalLokerController = async (req, res) => {
                     _id: "$role",
                     total: { $sum: 1 }
                 }
+            },
+            {
+                $sort: { _id: 1 }
             }
-        ])
+        ]);
+
 
         const sum = totalLockers.reduce((acc, curr) => acc + curr.total, 0);
 
         // const totalLockers = await lockerModel.updateMany(
         //     {
         //         role: {
-        //             $regex: /^\s*(Store|Fm)\s*$/i
+        //             $regex: /^\s*(Abhimanyu Sir)\s*$/i
         //         }
         //     },
-        //     { $set: { role: "FM" } }
+        //     { $set: { role: "ABHIMANYU" } }
         // );
 
 

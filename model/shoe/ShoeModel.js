@@ -20,7 +20,7 @@ const shoeSchema = new mongoose.Schema({
         validate: {
             validator: function (value) {
                 const allowedEmployers = [
-                    "NEEM", "NAPS", "TDS", "SSD", "CHAUDHARY", "LOREAL", "PERFECT SERVICE", "FM", "SIS"
+                    "NEEM", "NAPS", "TDS", "SSD", "CHAUDHARY", "LOREAL", "PERFECT SERVICE", "FM", "SIS", "RKS",
                 ];
                 return allowedEmployers.includes(value.toUpperCase());
             },
@@ -37,11 +37,8 @@ const shoeSchema = new mongoose.Schema({
                     "FLOW", "STORE", "OPERATOR", "SUPERVISOR",
                     "HOUSEKEEPING", "MAINTENANCE", "MFG", "QUALITY", "ADMIN", "HR", "PRODUCTION",
                     "FINANCE", "SAFETY", "ACCOUNT", "PROJECT", "IT", "MSC", "SECURITY", "UTILITY",
-                    "BOILER", "ETP", "PACKING", "SALES", "PURCHASE", "WAREHOUSE", "LOGISTICS",
-                    "CHANGEROOM", "LEGAL", "CUSTOMER SERVICE", "MARKETING", "PUBLIC RELATIONS",
-                    "R&D", "TRAINING", "CORPORATE COMMUNICATIONS", "BUSINESS DEVELOPMENT",
-                    "PROCUREMENT", "AUDIT", "LEGAL & COMPLIANCE", "SUPPLY CHAIN", "CSR", "MEDIA",
-                    "REGULATORY AFFAIRS", "INVESTOR RELATIONS", "TAX", "ADMINISTRATIVE SUPPORT"
+                    "BOILER", "ETP", "PACKING", "LOADING",
+                    "CHANGEROOM", "CONTRECTOR",
                 ];
                 return allowedEmployers.includes(value.toUpperCase());
             },

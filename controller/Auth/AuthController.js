@@ -942,12 +942,12 @@ export const getLockerCombineController = async (req, res) => {
 
 export const getTotalLokerController = async (req, res) => {
     try {
-        // const type = req.body?.type || req.params?.type || "address";
+        const type = req.body?.type || req.params?.type || req.query?.type || "role";
 
         const totalLockers = await lockerModel.aggregate([
             {
                 $group: {
-                    _id: "$role",
+                    _id: `$${type}`,
                     total: { $sum: 1 }
                 }
             },
@@ -957,7 +957,7 @@ export const getTotalLokerController = async (req, res) => {
         ]);
 
 
-        // const sum = totalLockers.reduce((acc, curr) => acc + curr.total, 0);
+        const sum = totalLockers.reduce((acc, curr) => acc + curr.total, 0);
 
         // const totalLockers = await lockerModel.updateMany(
         //     // {
@@ -985,7 +985,7 @@ export const getTotalLokerController = async (req, res) => {
             success: true,
             message: "Total lockers fetched successfully",
             totalLockers,
-            // totalSum: sum
+            totalSum: sum
         });
 
 

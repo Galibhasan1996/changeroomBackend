@@ -130,3 +130,4 @@ export const validateShoe = [
     check("mobile", "mobile is required").not().isEmpty().trim(),
     check("shoe_size", "shoe_size is required").not().isEmpty().trim(),
 ]
+

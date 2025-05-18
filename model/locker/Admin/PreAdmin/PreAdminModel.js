@@ -37,8 +37,9 @@ const preAdminLockerSchema = new mongoose.Schema(
         status: {
             type: String,
             trim: true,
-            enum: ["active", "inactive"],
-            default: "inactive",
+            enum: ["ACTIVE", "INACTIVE"],
+            default: "INACTIVE",
+            set: value => value?.toUpperCase()
         },
         mobile: {
             type: Number,

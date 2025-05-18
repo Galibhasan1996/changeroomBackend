@@ -202,77 +202,77 @@ export const createLockerController = async (req, res) => {
         if (!code) {
             return res.status(400).json({
                 success: false,
-                message: "code are required",
+                error: "code are required",
             })
         }
 
         if (!name) {
             return res.status(400).json({
                 success: false,
-                message: "name are required",
+                error: "name are required",
             })
         }
 
         if (!role) {
             return res.status(400).json({
                 success: false,
-                message: "role are required",
+                error: "role are required",
             })
         }
 
         if (!status) {
             return res.status(400).json({
                 success: false,
-                message: "status are required",
+                error: "status are required",
             })
         }
 
         if (!mobile) {
             return res.status(400).json({
                 success: false,
-                message: "mobile are required",
+                error: "mobile are required",
             })
         }
 
         if (!department) {
             return res.status(400).json({
                 success: false,
-                message: "department are required",
+                error: "department are required",
             })
         }
         if (!shoe_size) {
             return res.status(400).json({
                 success: false,
-                message: "shoe_size are required",
+                error: "shoe_size are required",
             })
         }
 
         if (!aadhar) {
             return res.status(400).json({
                 success: false,
-                message: "aadhar are required",
+                error: "aadhar are required",
             })
         }
 
         if (!address) {
             return res.status(400).json({
                 success: false,
-                message: "address are required",
+                error: "address are required",
             })
         }
 
-        if (!req.file) {
-            return res.status(400).json({
-                success: false,
-                message: "No file selected",
-            });
-        }
+        // if (!req.file) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "No file selected",
+        //     });
+        // }
         // photo get 
-        const file = getDataUri(req.file)
+        // const file = getDataUri(req.file)
 
 
         // update
-        const imageFileUpload = await cloudinary.v2.uploader.upload(file.content)
+        // const imageFileUpload = await cloudinary.v2.uploader.upload(file.content)
 
         const creatLocker = await lockerModel.create({
             sr_no,
@@ -287,10 +287,10 @@ export const createLockerController = async (req, res) => {
             department,
             combine,
             shoe_size,
-            image: {
-                public_id: imageFileUpload.public_id,
-                url: imageFileUpload.secure_url
-            },
+            // image: {
+            //     public_id: imageFileUpload.public_id,
+            //     url: imageFileUpload.secure_url
+            // },
             aadhar,
             address
         })
@@ -299,13 +299,13 @@ export const createLockerController = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            url: imageFileUpload.secure_url,
-            public_id: imageFileUpload.public_id,
-            creatLocker,
+            // url: imageFileUpload.secure_url,
+            // public_id: imageFileUpload.public_id,
             message: "locker create successfully",
+            creatLocker,
         })
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:310 ~ createLockerController ~ error:", error)
+        console.log("🚀 ~ AuthController.js:308 ~ createLockerController ~ error:", error)
         return res.status(400).json({
             success: false,
             message: "Something went wrong",
@@ -508,7 +508,7 @@ export const getLockerByIdController = async (req, res) => {
             locker,
         });
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:417 ~ getLockerByIdController ~ error:", error)
+        console.log("🚀 ~ AuthController.js:511 ~ getLockerByIdController ~ error:", error)
         return res.status(500).json({
             success: false,
             message: "Internal server error",
@@ -594,7 +594,7 @@ export const updateUserPhotoController = async (req, res) => {
         });
 
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:503 ~ updateUserPhotoController ~ error:", error)
+        console.log("🚀 ~ AuthController.js:597 ~ updateUserPhotoController ~ error:", error)
         return res.status(500).json({
             success: false,
             message: "Something went wrong",
@@ -609,7 +609,6 @@ export const updateUserPhotoController = async (req, res) => {
 export const searchByCodeLockerController = async (req, res) => {
     try {
         const { search, } = req.query;
-        // Validate if search parameter is provided
         if (!search || search.trim() === "") {
             return res.status(400).json({
                 success: false,
@@ -647,7 +646,7 @@ export const searchByCodeLockerController = async (req, res) => {
             locker,
         });
     } catch (err) {
-        console.log("🚀 ~ AuthController.js:556 ~ searchByCodeLockerController ~ err:", err)
+        console.log("🚀 ~ AuthController.js:650 ~ searchByCodeLockerController ~ err:", err)
         res.status(500).json({
             error: true,
             message: "Internal Server Error",
@@ -706,7 +705,7 @@ export const verifyOtpController = async (req, res) => {
         });
 
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:615 ~ verifyOtpController ~ error:", error.message)
+        console.log("🚀 ~ AuthController.js:709 ~ verifyOtpController ~ error:", error.message)
         return res.status(500).json({
             success: false,
             error: "Something went wrong",
@@ -736,11 +735,11 @@ export const getAllUserController = async (req, res) => {
         });
 
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:645 ~ getAllUserController ~ error:", error)
+        console.log("🚀 ~ AuthController.js:739 ~ getAllUserController ~ error:", error)
         return res.status(500).json({
             success: false,
             message: "Internal Server Error",
-            error: error.message, // Sending only the message for security reasons
+            error: error.message,
         });
     }
 };
@@ -795,7 +794,7 @@ export const refreshTokenController = async (req, res) => {
             user,
         });
     } catch (error) {
-        console.log("🚀 ~ refreshTokenController error:", error);
+        console.log("🚀 ~ AuthController.js:798 ~ refreshTokenController ~ error:", error)
         return res.status(500).json({
             success: false,
             message: "Internal Server Error",
@@ -886,7 +885,7 @@ export const getAllUsersController = async (req, res) => {
             users,
         });
     } catch (error) {
-        console.error("Error in getAllUsersController:", error);
+        console.log("🚀 ~ AuthController.js:889 ~ getAllUsersController ~ error:", error)
 
         if (error.name === 'CastError') {
             return res.status(400).json({ success: false, message: "Invalid input format" });
@@ -931,7 +930,7 @@ export const getLockerCombineController = async (req, res) => {
         });
 
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:935 ~ getLockerCombineController ~ error:", error)
+        console.log("🚀 ~ AuthController.js:934 ~ getLockerCombineController ~ error:", error)
         return res.status(500).json({
             success: false,
             message: "Internal Server Error",
@@ -991,10 +990,230 @@ export const getTotalLokerController = async (req, res) => {
 
 
     } catch (error) {
-        console.log("🚀 ~ AuthController.js:949 ~ getTotalLokerController ~ error:", error)
+        console.log("🚀 ~ AuthController.js:994 ~ getTotalLokerController ~ error:", error)
         return res.status(500).json({
             success: false,
             message: "Internal Server Error",
         })
     }
 }
+
+
+
+export const getAllOtherController = async (req, res) => {
+    try {
+        const { _id } = req.user;
+
+        if (!mongoose.Types.ObjectId.isValid(_id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid User ID",
+            });
+        }
+
+        const allUser = await UserModel.find({ _id: { $ne: _id } }).select("-password");
+
+        if (!allUser.length) {
+            return res.status(404).json({
+                success: false,
+                message: "No other users found.",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Users fetched successfully.",
+            totalUsers: allUser.length,
+            allUser
+        });
+
+    } catch (error) {
+        console.log("🚀 ~ AuthController.js:1032 ~ getAllOtherController ~ error:", error)
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+};
+
+// ----------------delete user controller -----------------------
+export const deleteUserController = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid User ID",
+            });
+        }
+
+
+        const user = await UserModel.findByIdAndDelete(id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "User deleted successfully",
+            user
+        });
+
+
+    } catch (error) {
+        console.log("🚀 ~ AuthController.js:1045 ~ deleteController ~ error:", error)
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        })
+
+    }
+}
+
+// -------------update user controller---------------
+export const updateUserController = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, email, mobile, dateOfBirth, isAdmin, verified } = req.body
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                error: "Invalid User ID",
+            });
+        }
+
+
+        const user = await UserModel.findOneAndUpdate({ _id: id },
+            { name, email, mobile, dateOfBirth, isAdmin: parseBoolean(isAdmin), verified: parseBoolean(verified) },
+            { new: true, runValidators: true });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                error: "User not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "User updated successfully",
+            user
+        })
+
+    } catch (error) {
+        console.log("🚀 ~ AuthController.js:1111 ~ updateUserController ~ error:", error)
+        if (error instanceof ReferenceError && error.message.includes("before initialization")) {
+            return res.status(400).json({
+                success: false,
+                message: "may be you select wrong model",
+                error: error.message
+            });
+        }
+
+    }
+}
+
+
+// ----------delete locker controller------------------
+
+export const deleteLocker = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Locker ID",
+            });
+        }
+
+        const locker = await lockerModel.findByIdAndDelete(id);
+
+        if (!locker) {
+            return res.status(404).json({
+                success: false,
+                message: "Locker not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Locker deleted successfully",
+            locker
+        });
+
+
+    } catch (error) {
+        console.log("🚀 ~ AuthController.js:1130 ~ deleteLocker ~ error:", error)
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        })
+
+    }
+}
+
+// -----------all locker controller-----------------
+
+
+export const allAsAdminLockerController = async (req, res) => {
+    try {
+        let { page, limit, search, sort, sortOrder } = req.query;
+
+        page = parseInt(page) || 1;
+        limit = parseInt(limit) || 30;
+        sort = sort || "sr_no";
+        sortOrder = sortOrder === "asc" ? -1 : 1;
+
+        const skip = (page - 1) * limit;
+
+        let searchCriteria = {};
+
+        if (search) {
+            searchCriteria = {
+                $or: [
+                    { locker_no: { $regex: search, $options: "i" } },
+                    { name: { $regex: search, $options: "i" } },
+
+                ],
+            };
+        }
+
+        const lockers = await lockerModel.find(searchCriteria)
+            .sort({ [sort]: sortOrder })
+            .skip(skip)
+            .limit(limit);
+
+        const totalLockers = await lockerModel.countDocuments(searchCriteria);
+
+        if (lockers.length === 0) {
+            return res.status(404).json({
+                success: false,
+                error: "No lockers found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            currentPage: page,
+            totalPages: Math.ceil(totalLockers / limit),
+            parPage: limit,
+            getResult: totalLockers,
+            message: "Lockers fetched successfully",
+            lockers,
+        });
+    } catch (error) {
+        console.log("🚀 ~ AuthController.js:1212 ~ allAsAdminLockerController ~ error:", error)
+        return res.status(500).json({
+            success: false,
+            error: `Something went wrong : => ${error.message}`,
+        });
+    }
+};
+

@@ -65,7 +65,7 @@ export const isAdmin = async (req, res, next) => {
         if (!token) {
             return res.status(401).json({
                 success: false,
-                message: "Token not found in the request headers"
+                error: "Token not found in the request headers"
             });
         }
 
@@ -76,7 +76,7 @@ export const isAdmin = async (req, res, next) => {
         if (!userOBJ) {
             return res.status(401).json({
                 success: false,
-                message: "Unauthorized: Invalid Token"
+                error: "Unauthorized: Invalid Token"
             });
         }
 
@@ -86,14 +86,14 @@ export const isAdmin = async (req, res, next) => {
         if (!user) {
             return res.status(401).json({
                 success: false,
-                message: "Unauthorized: User not found"
+                error: "Unauthorized: User not found"
             });
         }
 
         if (user.isAdmin === false) {
             return res.status(401).json({
                 success: false,
-                message: "you are not admin"
+                error: "you are not admin"
             });
         }
 

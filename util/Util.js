@@ -51,7 +51,7 @@ export const ganerateToken = (id) => {
 
 
 export function parseBoolean(value) {
-    const trimmed = value;
+    const trimmed = value ? value.trim().toLowerCase() : null;
     if (trimmed === "true" || trimmed === "True") return true;
     if (trimmed === "false" || trimmed === "False") return false;
     return trimmed;
